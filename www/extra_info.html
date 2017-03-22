@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<link type="text/css" rel="stylesheet" href="bootstrap.css"/>
+<meta charset="utf-8">
+<meta name="description" content="Shiny Application - Coursera Data Science Capstone Project">
+<meta name="Author" content="Aled Evans">
+<meta name="Date" content="March 2017">
+<title>Extra information - A Shiny Application For Suggestion/ Prediction Of The Next Word</title>
+
+<link rel="stylesheet" href="./jquery-ui.css">
+<script src="./jquery-3.1.1.js"></script>
+<script src="./jquery_ui_feb2017.js"></script>
+
+<style type="text/css">
+.container {height:80%;}
+h3 {font-family:"Trebuchet MS", Helvetica, sans-serif; font-weight:bold; font-size:80%; padding-bottom:1px;}
+span.bullet {margin-left:1px; font-size:1.3em; color:#e65c00;}
+ul {background-color:#ffd1b3; padding:0; margin-top:-5px; margin-bottom:-5px;}
+li {font-size:65%;}
+ol, ol.li {background-color:#e65c00; padding:10; margin-top:-5px; margin-bottom:-5px;}
+blockquote {width:65%;}
+a  {color:#e65c00;}
+a:hover  {color:#e65c00; text-decoration:none;}
+ol { counter-reset: item }
+ol li { display: flex; background-color:white; }
+ol li:before { content: counter(item) ") "; counter-increment:item; font-weight:bold; 
+  color:#e65c00; margin-left: 50px;}
+li.main   {margin-left:35px; margin-right:15px;padding-bottom:1px; list-style-type:decimal;}
+</style>
+<base target="_blank">
+</head>
+<body style="font-family:"Trebuchet MS", Helvetica, sans-serif; font-size:1.3em;">
+<div class="container">
+<div id="accordion">
+    
+
+<h3><span class="bullet">&#9733;</span>&nbsp;Notes (click for text)</h3>
+<div>
+   <ul>
+	<li class="main">Please enter word or phrase and see next word suggested.</li> 
+	<li class="main">Suggestion of next word takes place whilst text is inputed.</li>
+	<li class="main">Note: No text input sees 'NULL' displayed. If no word suggestion is found by the algorithm then the default word 'the' is suggested.</li>
+		<li class="main">This Shiny App is the  for Coursera / Johns Hopkins University Data Science specialization. It was developed by Aled Evans. (2017)</li>
+	</ul>
+</div>
+
+<h3><span class="bullet">&#9733;</span>&nbsp;Data Processing  (click for text)</h3>
+<div>
+   <ul>
+	<li class="main">The source files are sampled to give a corpus that is processed more swiftly. A 2% sample is used to construct the corpus.</li>
+	<li class="main">The corpus also undergoes text processing: all non-English characters are removed; numbers, punctuation, whitespace was also removed.</li>
+	<li class="main">Profane words removed. Use Carnegie Mellon University's resource: <a href="https://www.cs.cmu.edu/~biglou/resources/bad-words.txt"> 'Offensive/Profane Word List'</a>
+	<li class="main">Further notes and code for data processing can be in the <a href="https://rpubs.com/aledevans/Milestone_Report_Capstone_Project_Coursera"> 'Milestone Report' by Aled Evans.</a>
+   </ul>
+</div>
+
+<h3><span class="bullet">&#9733;</span>&nbsp;Prediction Algorithm  (click for text)</h3>
+<div>
+  <ul>
+    <li class="main">Tokenization is used for finding the frequency of five types of n-gram: unigrams (single words), bigrams (two word phrases), trigrams (three words), quadgrams (four word) and quintgrams (five words).</li>
+	<li class="main">N-grams indicate which words appear together in the text. The higher the frequency of a certain n-gram, the more likely it is to be found in the corpus.</li>
+	<li class="main">The predictive algorithm uses the n-gram frequency to suggest/ predict the next word based on the users input. The model checks the phrase length and starts with the quintgram, then moves onto quagram and so on. If there is no match the highest frequency unigram is suggested (this word is ‘the’). This is a version of a <a href="https://en.wikipedia.org/wiki/Katz%27s_back-off_model">‘back-off model’.</a>
+    </ul>
+</div>
+
+
+<h3><span class="bullet">&#9733;</span>&nbsp;NLP/ Data Weblinks & References  (click for text)</h3>
+<div>
+   <ul>
+	<li class="main"><a href="https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip">Link to data source for this capstone project</a>
+	<li class="main"><a href="https://www.cs.cmu.edu/~biglou/resources/bad-words.txt">Offensive/Profane Word List (Carnegie Mellon University)</a>
+	<li class="main"><a href="https://en.wikipedia.org/wiki/Katz%27s_back-off_model">Katz's Back-off model</a>
+	<li class="main"><a href="http://nlp.stanford.edu/~wcmac/papers/20050421-smoothing-tutorial.pdf">NLP Tutorial (Stanford).</a>
+	<li class="main"><a href="http://www.kdnuggets.com/2017/02/natural-language-processing-key-terms-explained.html">Natural Language Processing Key Terms Explained. (KDNuggets).</a>
+	</ul>
+</div>
+
+<h3><span class="bullet">&#9733;</span>&nbsp;Shiny UI and jquery References & Weblinks (click for text)</h3>
+<div>
+   <ul>
+	<li class="main"><a href="https://shiny.rstudio.com/articles/css.html">Style your apps with CSS.</a>
+	<li class="main"><a href="https://shiny.rstudio.com/articles/layout-guide.html">Application layout guide</a>
+	<li class="main"><a href="https://shiny.rstudio.com/articles/html-tags.html">Customize your UI with HTML</a>
+	<li class="main"><a href="https://shiny.rstudio.com/tutorial/lesson2/">Build a user-interface</a>
+	<li class="main"><a href="https://www.w3schools.com/howto/howto_js_accordion.asp">How TO - Collapsibles/Accordion. (W3schools.com).</a>
+	</ul>
+</div>
+
+</div>
+</div>
+
+<script>
+$(function() {
+    $( "#accordion" ).accordion({
+                heightStyle: "content"
+    })
+});
+</script>
+
+</body>
+</html>

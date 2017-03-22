@@ -1,0 +1,27 @@
+---
+title: "Readme"
+author: "Aled Evans"
+date: "22 March 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#### This GitHub repo is for the final submission for the Capstone Project of the [Coursera & Johns Hopkins University (in association with Swiftkey).](https://www.coursera.org/learn/data-science-project)
+
+#### The Shiny App can be found on [Rpubs.](URL link)
+
+#### The Shiny application ('app') suggests the next word following text input from the user.
+
+#### The Shiny App works across devices, but is optimised for use on a desktop web browser.
+
+#### The predictive algorithm uses the n-gram frequency to suggest/ predict the next word based on the users input. The model checks the phrase length and starts with the quintgram, then moves onto quagram and so on. The model is a version of a ['back-off' model](https://en.wikipedia.org/wiki/Katz%27s_back-off_model).
+
+#### The Shiny app also includes full documentation for the user. This is displayed at the bottom of the app and uses javascript/ jQuery interactive elements.
+
+#### The milestone report for this project is on [Rpubs.](https://rpubs.com/aledevans/Milestone_Report_Capstone_Project_Coursera)
+
+

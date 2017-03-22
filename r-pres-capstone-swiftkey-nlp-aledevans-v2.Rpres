@@ -1,0 +1,44 @@
+Capstone Project - NLP text prediction Shiny Application
+========================================================
+author: Aled Evans
+date: March 2017
+autosize: true
+font-family: 'Helvetica'
+
+- This pitch presentation is for a Shiny Application that uses natural language processing (NLP) for word prediction.
+- This is the capstone project for the Data Science Specialization offered by [Coursera & Johns Hopkins University (in association with Swiftkey).](https://www.coursera.org/learn/data-science-project)
+
+Introduction
+========================================================
+
+- The Shiny application ('app') suggests the next word following text input from the user.
+- The Shiny App works across devices, but is optimised for use on a desktop web browser.
+- The Shiny App can be found on [Rpubs.](URL link)
+- The Shiny app also includes full documentation for the user. This is displayed at the bottom of the app and uses javascript/ jQuery interactive elements.
+- The code and documentation for the app, project and this R presentation can be found on [GitHub.](URL link)
+
+
+Data Processing
+========================================================
+
+- The project data set is obtained from [here.](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip)
+- The source files are sampled to give a 'corpus' that is processed more swiftly. A 2% sample is used to construct the corpus.
+- The corpus also undergoes text processing: all non-English characters are removed; numbers, punctuation, whitespace was also removed. All text is also changed to lowercase. 
+- Profane words are also removed. The project used Carnegie Mellon University's resource:  [Offensive/Profane Word List.](https://www.cs.cmu.edu/~biglou/resources/bad-words.txt)
+
+
+Prediction Algorithm
+========================================================
+
+- Tokenization is used for finding the frequency of five types of n-gram: unigrams (single words), bigrams (two word phrases), trigrams (three words), quadgrams (four word) and quintgrams (five words).
+- N-grams indicate which words appear together in the text. (The higher the frequency of a certain n-gram, the more likely it is to be found in the corpus.)
+- The predictive algorithm uses the n-gram frequency to suggest/ predict the next word based on the users input. The model checks the phrase length and starts with the quintgram, then moves onto quagram and so on. The model is a version of a ['back-off' model](https://en.wikipedia.org/wiki/Katz%27s_back-off_model).
+
+Weblinks & References
+========================================================
+
+- The Shiny App on [Rpubs.]()
+- Code and documentation for the App, Project and this R presentation on [GitHub.]()
+- Milestone Report for this project on [Rpubs.](https://rpubs.com/aledevans/Milestone_Report_Capstone_Project_Coursera)
+- The data-set used to contruct the corpus is obtained from [here.](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip)
+- Further references and links are provided on Shiny App interface.

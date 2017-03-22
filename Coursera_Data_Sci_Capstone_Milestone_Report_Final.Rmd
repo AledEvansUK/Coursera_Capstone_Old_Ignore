@@ -1,0 +1,198 @@
+---
+title: "Coursera Data Science - Capstone Project - Milestone Report"
+author: "Aled Evans"
+date: "25 November 2016"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+```
+
+## Introduction
+
+###### This is the milestone report for the Coursera/ Johns Hopkins Data Science capstone project. The project is focused on developing a predictive text model using NLP (natural language processing) techniques. A large volume of text documents (referred to as the corpus) is analysed using NLP and to build the predictive text model. The text files used for the corpus are taken from US blogs, news and twitter – all of which are in the English language. 
+
+###### The predictive text model is similar to the models used by SwiftKey (a partner in the capstone project) in their smartphone keyboards. The predictive model takes a word (inputted by the user) and the model predicts the next word or phrase and offers it as a suggestion to the user.
+
+###### The milestone report briefly outlines the nature of the dataset / corpus and the results of exploratory data analysis. There is also a summary of the next steps for the development of the predictive model.
+
+
+#### Accessing Data and Basic Data Information 
+
+###### The data set is obtained from - https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip
+
+###### The code and procedures outlined below assume that the dataset is unzipped and the files are in the designated working directory of R.
+
+###### The text files (news, blogs and twitter) are now read into R. A summary dataframe is created which outlines the size of text files; the number of words in each file; and the number of lines.
+
+
+
+``` {r, Basic Information for Data part 1}
+
+# Read in news, blogs and twitter data
+newsData <- readLines("en_US.news.txt", , encoding = "UTF-8", skipNul = TRUE)
+blogsData <- readLines("en_US.blogs.txt", encoding = "UTF-8", skipNul = TRUE)
+twitterData <- readLines("en_US.twitter.txt", encoding = "UTF-8", skipNul = TRUE)
+
+# Obtain and print basic information on three files
+library(stringi)
+# File Sizes in MB's
+newsDataSize <- file.info("en_US.news.txt")$size / 1024^2
+blogsDataSize <- file.info("en_US.blogs.txt")$size / 1024^2
+twitterDataSize <- file.info("en_US.twitter.txt")$size / 1024^2
+
+# Number of words in each file
+newsDataWords <- stri_count_words(newsData)
+blogsDataWords  <- stri_count_words(blogsData)
+twitterDataWords  <- stri_count_words(twitterData)
+
+# Print table with basic summary of the three files - news, blogs and twitter
+data.frame(source = c("news","blogs", "twitter"), file_size_MB = c(newsDataSize, blogsDataSize, twitterDataSize), num_lines = c(length(newsData), length(blogsData), length(twitterData)), num_words = c(sum(newsDataWords), sum(blogsDataWords), sum(twitterDataWords)))
+
+```
+
+## Data cleaning
+
+###### As the files are very large, the files are sampled to give a corpus that is processed more swiftly. A 2% sample is used to construct the corpus. The corpus also undergoes text processing: all non-English characters are removed; numbers, punctuation, whitespace are also removed. Profane words are also removed. Finally, the corpus is converted to plain text.
+
+```{r}
+
+# load text mining and NLP packages
+library(tm)
+library(NLP)
+
+# Create 2% of sample for Corpus
+set.seed(4234)
+dataSample1 <- c(sample(newsData, length(newsData) *0.02), sample(blogsData, length(blogsData) *0.02), sample(twitterData, length(twitterData) *0.02))
+
+# remove non-English charcters from data sample using "iconv"
+dataSample2 <- iconv(dataSample1, "latin1", "ASCII", sub="")
+
+#create corpus
+corpus1 <- VCorpus(VectorSource(dataSample2))
+
+# profanity removal list - use Carnegie Mellon University's resource:  'Offensive/Profane Word List' (https://www.cs.cmu.edu/~biglou/resources/bad-words.txt)
+download.file("https://www.cs.cmu.edu/~biglou/resources/bad-words.txt", destfile = "bad-words.txt")
+profane_words <- read.delim("bad-words.txt", sep=":", header=FALSE)
+profane_words <- profane_words[,1]
+
+# remove additional whitespace
+corpus1 <- tm_map(corpus1, stripWhitespace)
+# remove numbers to create a text document
+corpus1 <- tm_map(corpus1, removeNumbers)
+# remove puncuation marks
+corpus1 <- tm_map(corpus1, removePunctuation)
+# remove profane words referenced in custom list
+corpus1 <- tm_map(corpus1, removeWords, profane_words)
+# transform to plain text document
+corpus1 <- tm_map(corpus1, PlainTextDocument)
+
+```
+
+
+## Exploratory Data Analysis
+
+#### Tokenize and find n-gram frequency
+
+###### The RWeka package is used to create functions that tokenize the corpus and find n-grams. The tokenization is for finding the frequency of three types of n-gram: unigrams (single words), bigrams (two word phrases) and trigrams (three word phrases).
+
+###### The n-grams indicate which words appear together in the text. The higher the frequency of a certain n-gram, the more likely it is to be found in the corpus. The use of n-gram frequency is key to building this form of predictive text model.
+  
+
+
+```{r create tokenizers for each n-gram and find n-gram frequency}
+
+library(ggplot2)
+library(RWeka)
+
+# Tokenizer function  for n-grams.
+# Unigram tokenizer - 1 word 
+unigramToken <- function(x) NGramTokenizer(x, Weka_control(min=1, max=1))
+# Bigram tokenizer - 2 words
+bigramToken <- function(x) NGramTokenizer(x, Weka_control(min=2, max=2))
+# Trigram tokenizer - 3 words
+trigramToken <- function(x) NGramTokenizer(x, Weka_control(min=3, max=3))
+
+options(mc.cores = 1)
+# helper function to find frequency of n-grams in the corpus
+topFreq <- function(tdm) {
+    freq <- sort(rowSums(as.matrix(tdm)), decreasing = TRUE)
+    freq_dataframe <- (data.frame(word = names(freq), freq = freq))
+    return(freq_dataframe)
+}
+
+# Create files with n-gram frequency - most common unigrams, bigrams and trigrams - for plotting.
+# Unigram frequency
+unigram_freq <- TermDocumentMatrix(corpus1, control=list(tokenize=unigramToken))
+unigram_freq2 <- removeSparseTerms(unigram_freq, 0.99)
+uniCorpus_freq3 <- topFreq(unigram_freq2)
+
+# bigram frequency
+bigram_freq <- TermDocumentMatrix(corpus1, control=list(tokenize=bigramToken ))
+bigram_freq2 <- removeSparseTerms(bigram_freq, 0.999)
+biCorpus_freq3 <- topFreq(bigram_freq2)
+
+# trigram frequency
+trigram_freq <- TermDocumentMatrix(corpus1,  control=list(tokenize=trigramToken))
+trigram_freq2 <- removeSparseTerms(trigram_freq, 0.9999)
+triCorpus_freq3 <- topFreq(trigram_freq2)
+
+```
+
+## Data Visualization
+
+###### The plot of the top 20 (i.e. most frequent) unigrams: 
+
+```{r unigram plot}
+# plot top 20 unigrams
+n_gram_chart <- ggplot(uniCorpus_freq3[1:20,], aes(x=reorder(word, freq), y =freq)) +
+       theme(legend.title = element_blank()) +
+        geom_bar(stat="identity", fill = "coral2") + coord_flip() + labs(title= "Top 20 Unigrams (1 word)") +
+    xlab("Word") +
+    ylab("Unigram Frequency")
+print(n_gram_chart)
+
+```
+
+###### A plot of the top 20 bigrams:
+
+```{r bigram plot}
+# plot top 20 bigrams
+bi_gram_chart <- ggplot(biCorpus_freq3[1:20,], aes(x=reorder(word, freq), y =freq)) +
+       theme(legend.title = element_blank()) +
+        geom_bar(stat="identity", fill = "springgreen4") + coord_flip() + labs(title= "Top 20 Bigrams (2 word phrases)") +
+    xlab("Phrases") +
+    ylab("Bigram Frequency")
+print(bi_gram_chart)
+
+```
+
+###### A plot of the top 20 trigrams: 
+
+```{r trigram plot}
+# plot top 20 trigrams
+tri_gram_chart <- ggplot(triCorpus_freq3[1:20,], aes(x=reorder(word, freq), y =freq)) +
+       theme(legend.title = element_blank()) +
+        geom_bar(stat="identity", fill = "dodgerblue3") + coord_flip() + labs(title= "Top 20 Trigrams (3 words phrases)") +
+    xlab("Phrases") +
+    ylab("Trigram Frequency")
+print(tri_gram_chart)
+
+```
+
+## Next steps for project
+
+###### The exploratory data analysis has demonstrated the occurrence of a range of n-grams that can be used to build a predictive text model. One possible strategy is for the predictive model, once the user has entered a word, to first use a trigram to predict the next word. If the trigram does not provide a match, a bigram is then used to predict the next word. This is a version of a 'back-off model' (reference: https://en.wikipedia.org/wiki/Katz's_back-off_model)
+
+###### Once the predictive model is developed, it will use a Shiny app as the user interface. The Shiny app will suggest the next word for a user based on the initial text input of the user.
+
+
+
+
+
+
